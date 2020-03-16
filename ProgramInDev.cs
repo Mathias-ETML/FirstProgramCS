@@ -719,13 +719,13 @@ namespace ProjetCavalierFinal
                 // sleep de 3 sec pour que l'user puisse voir que il a fini
                 Thread.Sleep(3000);
 
-                // je vais vous mentire mais j'ai 0 idée de ce que sa fait
+                // je vais vous mentir mais j'ai 0 idée de ce que sa fait
             }).GetAwaiter().GetResult();
         } // fin static void Main ( jeu cavalier )       
     } // fin class Programm
 } // fin Namespace ProjetCavalier final
 // fin ProjetCavalierFinal le 11.03.2020
-// le projet est foncitonnel, mais loin d'être commenté assé et optimisé de mon point de vue
+// le projet est foncitonnel, mais loin d'être commenté assez et optimisé de mon point de vue
 
 
 // fin optimisation et commentaire du projet le 15.03.2020
