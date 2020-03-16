@@ -1,4 +1,6 @@
-﻿using System;
+// problème du cavalier : si je reste appuyé sur par exemple : la flèche de droite, et que je fonce dans un mur, 
+// le sleep ne vas pas s'effectuer corrêctement et va répéter le pressement de la touche au lieu de tout arrêter et de continuer
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
