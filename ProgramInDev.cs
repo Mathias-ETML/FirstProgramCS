@@ -1,5 +1,6 @@
 // problème du cavalier : si je reste appuyé sur par exemple : la flèche de droite, et que je fonce dans un mur, 
 // le sleep ne vas pas s'effectuer corrêctement et va répéter le pressement de la touche au lieu de tout arrêter et de continuer
+// https://docs.microsoft.com/fr-fr/dotnet/csharp/programming-guide/concepts/async/
 using System;
 using System.Collections.Generic;
 using System.Linq;
