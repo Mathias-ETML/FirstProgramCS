@@ -481,9 +481,9 @@ namespace ProjetCavalierFinal
                 Console.ForegroundColor = ConsoleColor.Red;
             }
             else
-	        {
-                // si non alors en gris 
-                Console.ForegroundColor = ConsoleColor.Gray;
+	    {
+            	// si non alors en gris 
+            	Console.ForegroundColor = ConsoleColor.Gray;
             }
             // déplace le curseur sur le tableau clean
             Console.SetCursorPosition(G_sbyteXUser + G_sbyteUser + 1, G_sbyteYUser);
