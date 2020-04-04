@@ -14,78 +14,7 @@ namespace ProjetCavalierFinal
         private static sbyte G_sbyteYUser = 1;
 
         private static char[,] G_Tab_charCavalier;
-        private static char[] G_Tab_charCavalierAnswer;
-
-        /// <summary>
-        /// Debugger : j'ecrit les 2 tableaux pour les comparer
-        /// Problème : dans mon cas je n'arrivais pas comparer les 2 séquances avec le .SequenceEqual car elle ne permet pas de comparer les tableaux multi dimensional arrays
-        /// Solution : flatten les 2 tableaux et les comparer
-        /// Succès : oui
-        /// Optimisation : pas besoin c'est un debugger temporaire
-        /// </summary>
-
-        private static void Debug(byte byteUser)
-        {
-            // variables locales
-            byte byteX = 0;
-            byte byteY = 0;
-
-            // reset couleur console pour eviter d'avoir un truck en bleu ou rouge illisible
-            Console.ForegroundColor = ConsoleColor.Gray;
-
-            // flatten le tableau qui permet de comparer si le joueur l'a rempli de 'O'
-            char[] tab_FlattenTblAnswer = G_Tab_charCavalierAnswer.Cast<char>().ToArray();
-
-            // crée une première version du tableau ou le pion se trouve
-            char[] tab_FlattenPion = G_Tab_charCavalier.Cast<char>().ToArray();
-
-            // boucle for qui va ecrire le cavalier en vertical
-            for (byteY = 0; byteY != byteUser; byteY++)
-            {
-                // boucle for qui va ecrire le cavalier en horizontal
-                for (byteX = 0; byteX != byteUser; byteX++)
-                {
-                    // met le curseur en dessous du tableau
-                    Console.SetCursorPosition(byteX, byteY + 10);
-
-                    // ecrit le cavalier qui doit être obtenu pour finir le jeu
-                    //Console.Write(G_Tab_charCavalierAnswer[byteY, byteX]);
-
-                    // met le curseur encore plus en dessous du tableau
-                    Console.SetCursorPosition(byteX, byteY + 20);
-
-                    // ecrit le cavalier qui doit être obtenu pour finir le jeu
-                    Console.Write(G_Tab_charCavalier[byteY, byteX]);
-                }
-            }
-            // permet d'ecrire les tableaux flatten ( pas optimisé )
-            for (int i = 0; i < tab_FlattenPion.Length; i++)
-            {
-                // met le curseur encore plus en bas
-                Console.SetCursorPosition(i, 30);
-
-                // ecrit le caractère flatten en fonction de i
-                Console.Write(tab_FlattenPion[i]);
-
-                // met le curseur encore encore plus en bas
-                Console.SetCursorPosition(i, 40);
-
-                // ecrit le caractère flatten en fonction de i
-                Console.Write(tab_FlattenTblAnswer[i]);
-            }
-
-            // met le curseur a droite
-            Console.SetCursorPosition(byteX + 10, byteY + 10);
-
-            // ecrit la position X actuele du pion 
-            Console.Write("X : " + byteX);
-
-            // met le curseur a droite et 1 en dessous du précédant
-            Console.SetCursorPosition(byteX + 10, byteY + 11);
-
-            // ecrit la position Y actuele du pion 
-            Console.Write("Y : " + byteY);
-        }
+        private static char[] G_Tab_charCavalierAnswer;       
 
         /// <summary>
         /// Reset : Reset du cavalier, donc des variables, tableaux, char, console
