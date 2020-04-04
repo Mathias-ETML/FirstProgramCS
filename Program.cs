@@ -10,11 +10,84 @@ namespace ProjetCavalierFinal
         /// Variables globales, norme Deschamps
         /// </summary>
 
+        private static sbyte G_sbyteUser = 0;
+        private static char G_charTbl = ' ';
+
         private static sbyte G_sbyteXUser = 1;
         private static sbyte G_sbyteYUser = 1;
 
+        private static byte G_byteX = 0;
+        private static byte G_byteY = 0;
+
         private static char[,] G_Tab_charCavalier;
-        private static char[] G_Tab_charCavalierAnswer;       
+        private static char[,] G_Tab_charCavalierAnswer;
+
+        /// <summary>
+        /// Debugger : j'ecrit les 2 tableaux pour les comparer
+        /// Problème : dans mon cas je n'arrivais pas comparer les 2 séquances avec le .SequenceEqual car elle ne permet pas de comparer les tableaux multi dimensional arrays
+        /// Solution : flatten les 2 tableaux et les comparer
+        /// Succès : oui
+        /// Optimisation : pas besoin c'est un debugger temporaire
+        /// </summary>
+
+        private static void Debug()
+        {
+            // reset couleur console pour eviter d'avoir un truck en bleu ou rouge illisible
+            Console.ForegroundColor = ConsoleColor.Gray;
+
+            // flatten le tableau qui permet de comparer si le joueur l'a rempli de 'O'
+            char[] tab_FlattenTblAnswer = G_Tab_charCavalierAnswer.Cast<char>().ToArray();
+
+            // crée une première version du tableau ou le pion se trouve
+            char[] tab_FlattenPion = G_Tab_charCavalier.Cast<char>().ToArray();
+
+            // boucle for qui va ecrire le cavalier en vertical
+            for (G_byteY = 0; G_byteY != G_sbyteUser; G_byteY++)
+            {
+                // boucle for qui va ecrire le cavalier en horizontal
+                for (G_byteX = 0; G_byteX != G_sbyteUser; G_byteX++)
+                {
+                    // met le curseur en dessous du tableau
+                    Console.SetCursorPosition(G_byteX, G_byteY + 10);
+
+                    // ecrit le cavalier qui doit être obtenu pour finir le jeu
+                    Console.Write(G_Tab_charCavalierAnswer[G_byteY, G_byteX]);
+
+                    // met le curseur encore plus en dessous du tableau
+                    Console.SetCursorPosition(G_byteX, G_byteY + 20);
+
+                    // ecrit le cavalier qui doit être obtenu pour finir le jeu
+                    Console.Write(G_Tab_charCavalier[G_byteY, G_byteX]);
+                }
+            }
+            // permet d'ecrire les tableaux flatten ( pas optimisé )
+            for (int i = 0; i < tab_FlattenPion.Length; i++)
+            {
+                // met le curseur encore plus en bas
+                Console.SetCursorPosition(i, 30);
+
+                // ecrit le caractère flatten en fonction de i
+                Console.Write(tab_FlattenPion[i]);
+
+                // met le curseur encore encore plus en bas
+                Console.SetCursorPosition(i, 40);
+
+                // ecrit le caractère flatten en fonction de i
+                Console.Write(tab_FlattenTblAnswer[i]);
+            }
+
+            // met le curseur a droite
+            Console.SetCursorPosition(G_byteX + 10, G_byteY + 10);
+
+            // ecrit la position X actuele du pion 
+            Console.Write("X : " + G_sbyteXUser);
+
+            // met le curseur a droite et 1 en dessous du précédant
+            Console.SetCursorPosition(G_byteX + 10, G_byteY + 11);
+
+            // ecrit la position Y actuele du pion 
+            Console.Write("Y : " + G_sbyteYUser);
+        }
 
         /// <summary>
         /// Reset : Reset du cavalier, donc des variables, tableaux, char, console
@@ -24,7 +97,7 @@ namespace ProjetCavalierFinal
         /// Optimisation : ok
         /// </summary>
 
-        private static void Reset(byte byteUser)
+        private static void Reset()
         {
             // clear de la console
             Console.Clear();
@@ -37,18 +110,22 @@ namespace ProjetCavalierFinal
             G_sbyteXUser = 1;
             G_sbyteYUser = 1;
 
+            // reset pour ecrire les tableaux
+            G_byteX = 0;
+            G_byteY = 0;
+
             // oui je sais que les tableaux avec des valeurs nulls c'est pas bien mais il faut bien que je les réinitialise
             G_Tab_charCavalier = null;
             G_Tab_charCavalierAnswer = null;
 
             // reset taille tbl user
-            byteUser = 0;
+            G_sbyteUser = 0;
 
             // call le programm InputUser, se réferer au static void InputUser() pour le code
             InputUser();
 
             // call le programm tableau, se réferer au static void Tableau() pour le code
-            Tableau(byteUser);
+            Tableau();
         }
 
         /// <summary>
@@ -57,10 +134,8 @@ namespace ProjetCavalierFinal
         /// Optimisation : ok
         /// </summary>
 
-        private static byte InputUser()
+        private static void InputUser()
         {
-            byte byteUser = 0;
-
             // début du code
             Console.Clear();
 
@@ -73,7 +148,7 @@ namespace ProjetCavalierFinal
                           "*******************************\n");
 
             // demande la largeur du cavalier
-            for (; byteUser < 7 || byteUser > 30;)
+            for (; G_sbyteUser < 7 || G_sbyteUser > 30;)
             {
                 // demande l'input user
                 Console.Write("Entrez la largeur du cavalier (min : 7 / max : 30) : ");
@@ -82,12 +157,12 @@ namespace ProjetCavalierFinal
                 try
                 {
                     // converti l'input user
-                   byteUser = Convert.ToByte(Console.ReadLine());
+                    G_sbyteUser = Convert.ToSByte(Console.ReadLine());
                 }
                 // catch si l'user ecrit un nombre > 127
                 catch (OverflowException)
                 {
-                    byteUser = 0;
+                    G_sbyteUser = 0;
                 }
                 // catch si l'user ecrit un caractère autre que un nombre
                 catch (FormatException)
@@ -98,9 +173,6 @@ namespace ProjetCavalierFinal
 
             // clear console pour laisser apparaitre seulement le tableau
             Console.Clear();
-
-            // return valeur input user
-            return byteUser;
         }
 
         /// <summary>
@@ -109,57 +181,52 @@ namespace ProjetCavalierFinal
         /// Optimisation : peut faire mieux
         /// </summary>
 
-        private static void Tableau(byte byteUser)
+        private static void Tableau()
         {
-            // variables locales
-            char charTbl = ' ';
-            byte byteX = 0;
-            byte byteY = 0;
-
             // création du tableau answer avec l'input user
-            char[,] Tab_charCavalierAnswer = new char[byteUser, byteUser];
+            G_Tab_charCavalierAnswer = new char[G_sbyteUser, G_sbyteUser];
 
             // création tableau user avec l'input user
-            G_Tab_charCavalier = new char[byteUser, byteUser];
+            G_Tab_charCavalier = new char[G_sbyteUser, G_sbyteUser];
 
             // début boucle for Y, pour ecrire verticallement les cavalies
-            for (byteY = 0; byteY != byteUser; byteY++)
+            for (G_byteY = 0; G_byteY != G_sbyteUser; G_byteY++)
             {
                 // début boucle for Y, pour ecrire honrizontallement les cavalies
-                for (byteX = 0; byteX != byteUser; byteX++)
+                for (G_byteX = 0; G_byteX != G_sbyteUser; G_byteX++)
                 {
-                    // si byteX ou byteY = a 0 ou a sbyteUser -1, donc c'est une bordure
-                    if (byteX == 0 || byteY == 0 || byteX == byteUser - 1 || byteY == byteUser - 1)
+                    // si G_byteX ou G_byteY = a 0 ou a sbyteUser -1, donc c'est une bordure
+                    if (G_byteX == 0 || G_byteY == 0 || G_byteX == G_sbyteUser - 1 || G_byteY == G_sbyteUser - 1)
                     {
                         // regarde si la position actuelle de la boucle for est autre que la bordure tout en haut et tout en bas
-                        if (byteX == 0 && byteY != 0 && byteY != byteUser - 1 || byteX == byteUser - 1 && byteY != 0 && byteY != byteUser - 1)
+                        if (G_byteX == 0 && G_byteY != 0 && G_byteY != G_sbyteUser - 1 || G_byteX == G_sbyteUser - 1 && G_byteY != 0 && G_byteY != G_sbyteUser - 1)
                         {
-                            charTbl = '║';
+                            G_charTbl = '║';
                         }
                         // regarde si la position actuelle de la boucle for est autre que la bordure à gauche ou a droite
-                        else if (byteY == 0 && byteX != 0 && byteX != byteUser - 1 || byteY == byteUser - 1 && byteX != 0 && byteX != byteUser - 1)
+                        else if (G_byteY == 0 && G_byteX != 0 && G_byteX != G_sbyteUser - 1 || G_byteY == G_sbyteUser - 1 && G_byteX != 0 && G_byteX != G_sbyteUser - 1)
                         {
-                            charTbl = '═';
+                            G_charTbl = '═';
                         }
                         // regarde si c'est le coin en haut a droite
-                        else if (byteX == 0 && byteY == 0)
+                        else if (G_byteX == 0 && G_byteY == 0)
                         {
-                            charTbl = '╔';
+                            G_charTbl = '╔';
                         }
                         // regarde si c'est le coin en haut a gauche
-                        else if (byteX == byteUser - 1 && byteY == 0)
+                        else if (G_byteX == G_sbyteUser - 1 && G_byteY == 0)
                         {
-                            charTbl = '╗';
+                            G_charTbl = '╗';
                         }
                         // regarde si c'est le coin en bas a droite
-                        else if (byteX == 0 && byteY == byteUser - 1)
+                        else if (G_byteX == 0 && G_byteY == G_sbyteUser - 1)
                         {
-                            charTbl = '╚';
+                            G_charTbl = '╚';
                         }
                         // regarde si c'est le coin en bas a gauche
-                        else if (byteX == byteUser - 1 && byteY == byteUser - 1)
+                        else if (G_byteX == G_sbyteUser - 1 && G_byteY == G_sbyteUser - 1)
                         {
-                            charTbl = '╝';
+                            G_charTbl = '╝';
                         }
 
                         // met la bordure en bleu vu que c'est une bordure
@@ -172,54 +239,51 @@ namespace ProjetCavalierFinal
                         Console.ForegroundColor = ConsoleColor.Red;
 
                         // change le caratère actuelle en croix
-                        charTbl = 'x';
+                        G_charTbl = 'x';
                     }
 
                     // ecrit le caratère actuelle dans le tableau principale
-                    G_Tab_charCavalier[byteY, byteX] = charTbl;
+                    G_Tab_charCavalier[G_byteY, G_byteX] = G_charTbl;
 
                     // ecrit le caratère actuelle dans le tableau secondaire
-                    Tab_charCavalierAnswer[byteY, byteX] = charTbl;
+                    G_Tab_charCavalierAnswer[G_byteY, G_byteX] = G_charTbl;
 
                     // si le caratère actuelle est un X, alors va ecrire dans le tableau de réponse un O, vu que on doit remplire le tableau user avec des O
-                    if (charTbl == 'x')
+                    if (G_charTbl == 'x')
                     {
                         // ecrit un O dans le tableau de réponse
-                        Tab_charCavalierAnswer[byteY, byteX] = 'O';
+                        G_Tab_charCavalierAnswer[G_byteY, G_byteX] = 'O';
                     }
 
                     // set le curseur pour ecrire le tableau principal
-                    Console.SetCursorPosition(byteX, byteY);
+                    Console.SetCursorPosition(G_byteX, G_byteY);
 
                     // ecrit le caractère séléctionné par l'algoritme
-                    Console.Write(charTbl);
+                    Console.Write(G_charTbl);
 
                     // set le curseur pour ecrire le tableau secondaire
-                    Console.SetCursorPosition(byteX + byteUser + 1, byteY);
+                    Console.SetCursorPosition(G_byteX + G_sbyteUser + 1, G_byteY);
 
                     // ecrit le caractère séléctionné par l'algoritme
-                    Console.Write(charTbl);
+                    Console.Write(G_charTbl);
 
                 } // fin boucle for X
             } // fin boucle for Y
 
-            // initialisation tableau réponse answer
-            G_Tab_charCavalierAnswer = Tab_charCavalierAnswer.Cast<char>().ToArray();
-
             // initalisation pion
-            G_Tab_charCavalier[1, 1] = 'O';
+            G_Tab_charCavalier[G_sbyteXUser, G_sbyteYUser] = 'O';
 
             // change la couleur en gris
             Console.ForegroundColor = ConsoleColor.Gray;
 
             // met le curseur en dehor du tableau
-            Console.SetCursorPosition(5, G_sbyteYUser + byteUser);
+            Console.SetCursorPosition(5, G_sbyteYUser + G_sbyteUser);
 
             // ecrit comment leave le jeu
             Console.Write("Appuyze sur Escape pour quitter le jeu");
 
             // met le curseur en dehor du tableau avec y + 1
-            Console.SetCursorPosition(5, G_sbyteYUser + byteUser + 1);
+            Console.SetCursorPosition(5, G_sbyteYUser + G_sbyteUser + 1);
 
             // ecrit comment reset le jeu
             Console.Write("Appuyze sur 'r' pour reset le cavalier");           
@@ -231,23 +295,16 @@ namespace ProjetCavalierFinal
         /// Optimisation : ok
         /// </summary>
 
-        private static void ErreurTbl(byte byteUser)
+        private static void ErreurTbl()
         {
             // se met en dehor du tableau
-            Console.SetCursorPosition(byteUser - 2, byteUser + 4);
+            Console.SetCursorPosition(G_sbyteUser - 2, G_sbyteUser + 4);
 
             // change la couleur de la console
             Console.ForegroundColor = ConsoleColor.Red;
 
             // ecrit le message d'erreur
-            Console.Write("\n\nVous ne pouvez pas vous déplacer en dehors du tableau" +
-                          "");
-
-            // sleep de 1000 sec
-            Thread.Sleep(1000);
-
-            Console.ReadKey();
-
+            Console.Write("\n\nVous ne pouvez pas vous déplacer en dehors du tableau");
         } // fin void static ErreurTbl()
 
         /// <summary>
@@ -258,10 +315,10 @@ namespace ProjetCavalierFinal
         /// PS : ne pas oublier d'inverser la position cursuer ( marche en x y ) et le tableau ( marche en y x )
         /// </summary>
 
-        private static void CheckChar(byte byteUser)
+        private static void CheckChar()
         {
             // check si il est a coté d'une bordure
-            if (G_sbyteXUser == 1 || G_sbyteYUser == 1 || G_sbyteXUser == byteUser - 2 || G_sbyteYUser == byteUser - 2)
+            if (G_sbyteXUser == 1 || G_sbyteYUser == 1 || G_sbyteXUser == G_sbyteUser - 2 || G_sbyteYUser == G_sbyteUser - 2)
             {
                 // change la couleur d'ecriture des caractères en bleu vu que c'est une bordure
                 Console.ForegroundColor = ConsoleColor.Blue;
@@ -270,7 +327,7 @@ namespace ProjetCavalierFinal
                 if (G_sbyteXUser == 1 || G_sbyteYUser == 1)
                 {
                     // regarde si il est sur la bordure du haut
-                    if (G_sbyteYUser == 1 && G_sbyteXUser != 1 && G_sbyteXUser != byteUser - 2)
+                    if (G_sbyteYUser == 1 && G_sbyteXUser != 1 && G_sbyteXUser != G_sbyteUser - 2)
                     {
                         // met le curseur sur la bordure du haut
                         Console.SetCursorPosition(G_sbyteXUser - 1, G_sbyteYUser - 1);
@@ -285,7 +342,7 @@ namespace ProjetCavalierFinal
                         Console.Write('╦');
                     }
                     // si non alors bordure de gauche
-                    else if (G_sbyteXUser == 1 && G_sbyteYUser != 1 && G_sbyteYUser != byteUser - 2)
+                    else if (G_sbyteXUser == 1 && G_sbyteYUser != 1 && G_sbyteYUser != G_sbyteUser - 2)
                     {
                         // met le curseur sur la bordure de gauche
                         Console.SetCursorPosition(G_sbyteXUser - 1, G_sbyteYUser + 1);
@@ -300,7 +357,7 @@ namespace ProjetCavalierFinal
                         Console.Write('╠');
                     }
                     // regarde si il est dans le coin en bas a droite
-                    else if (G_sbyteXUser == 1 && G_sbyteYUser == byteUser - 2)
+                    else if (G_sbyteXUser == 1 && G_sbyteYUser == G_sbyteUser - 2)
                     {
                         // met le curseur sur la bordure de gauche
                         Console.SetCursorPosition(G_sbyteXUser - 1, G_sbyteYUser - 1);
@@ -315,7 +372,7 @@ namespace ProjetCavalierFinal
                         Console.Write('╩');
                     }
                     // regarde si il est dans le coin sur la bordure de gauche
-                    else if (G_sbyteXUser == byteUser - 2)
+                    else if (G_sbyteXUser == G_sbyteUser - 2)
                     {
                         // met le curseur sur la bordure du haut
                         Console.SetCursorPosition(G_sbyteXUser - 1, G_sbyteYUser - 1);
@@ -349,7 +406,7 @@ namespace ProjetCavalierFinal
                 else
                 {
                     // regarde si il est bordure de droite
-                    if (G_sbyteXUser == byteUser - 2 && G_sbyteYUser != byteUser - 2)
+                    if (G_sbyteXUser == G_sbyteUser - 2 && G_sbyteYUser != G_sbyteUser - 2)
                     {
                         // met le curseur sur la bordure de droite
                         Console.SetCursorPosition(G_sbyteXUser + 1, G_sbyteYUser - 1);
@@ -364,7 +421,7 @@ namespace ProjetCavalierFinal
                         Console.Write('╣');
                     }
                     // si non regarde si il est sur la bordure du bas
-                    else if (G_sbyteYUser == byteUser - 2 && G_sbyteXUser != byteUser - 2)
+                    else if (G_sbyteYUser == G_sbyteUser - 2 && G_sbyteXUser != G_sbyteUser - 2)
                     {
                         // met le curseur sur la bordure en bas
                         Console.SetCursorPosition(G_sbyteXUser + 1, G_sbyteYUser + 1);
@@ -405,50 +462,48 @@ namespace ProjetCavalierFinal
         /// Optimisation : a voir
         /// </summary>
 
-        private static void DecoPion(byte byteUser)
+        private static void DecoPion()
         {
-            // variables
-            byte byteX = 0;
-            byte byteY = 0;
-
+            // ╝    ╗    ╔    ╚    ╣    ╩    ╦    ╠    ═    ║    ╬
+            // tableau qui permet de décorer le pion
             char[,] tab_charCaracteres =
             {
                 {'╔', '═', '╗' },
                 {'║', 'O', '║' },
                 {'╚', '═', '╝' }
             };
-            // tableau qui permet de décorer le pion
+
             // début boucle for Y, pour la hauteur
-            for (byteY = 0; byteY < 5; byteY++)
+            for (G_byteY = 0 ; G_byteY < 5; G_byteY++)
             {
                 // début boucle for X, pour la largeur
-                for (byteX = 0; byteX < 5; byteX++)
+                for (G_byteX = 0 ; G_byteX < 5; G_byteX++)
                 {
                     // try, pour catch les excpetion si curseur se met en dehors console ou si valeur recherché en dehors tableau
                     try
                     {
                         // regarde si XY sont dans la range pour ecrire le carré du pion
-                        if (byteX <= 3 && byteX >= 1 && byteY != 0 && byteY != 4)
+                        if (G_byteX <= 3 && G_byteX >= 1 && G_byteY != 0 && G_byteY != 4)
                         {
                             // met les caratères a ecrire en bleu vu que c'est alors une bordure
                             Console.ForegroundColor = ConsoleColor.Blue;
 
                             // met le curseur via la position XY - 2 ( vu que on check sur une zone de 5x5 et le pion est au millieu )
-                            Console.SetCursorPosition(G_sbyteXUser + byteX - 2, G_sbyteYUser + byteY - 2);
+                            Console.SetCursorPosition(G_sbyteXUser + G_byteX - 2, G_sbyteYUser + G_byteY - 2);
 
                             // ecrit les caratères du tableau - 1 ( vu que il va de 0 à 2 )
-                            Console.Write(tab_charCaracteres[byteY - 1, byteX - 1]);
+                            Console.Write(tab_charCaracteres[G_byteY - 1, G_byteX - 1]);
                         }
                         else
                         {
                             // check si le caractère ou il se trouve est un " x "
-                            if (G_Tab_charCavalier[G_sbyteYUser + byteY - 2, G_sbyteXUser + byteX - 2] == 'x')
+                            if (G_Tab_charCavalier[G_sbyteYUser + G_byteY - 2, G_sbyteXUser + G_byteX - 2] == 'x')
                             {
                                 // change la couleur des caractères a ecrire en rouge
                                 Console.ForegroundColor = ConsoleColor.Red;
                             }
                             // check si le caractère ou il se trouve est un " O ", donc une ancienne case du joueur
-                            else if (G_Tab_charCavalier[G_sbyteYUser + byteY - 2, G_sbyteXUser + byteX - 2] == 'O')
+                            else if (G_Tab_charCavalier[G_sbyteYUser + G_byteY - 2, G_sbyteXUser + G_byteX - 2] == 'O')
                             {
                                 // change la couleur des caractères a ecrire en gris
                                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -460,10 +515,10 @@ namespace ProjetCavalierFinal
                                 Console.ForegroundColor = ConsoleColor.Blue;
                             }
                             // met le curseur via la position XY - 2 ( vu que on check sur une zone de 5x5 et le pion est au millieu )
-                            Console.SetCursorPosition(G_sbyteXUser + byteX - 2, G_sbyteYUser + byteY - 2);
+                            Console.SetCursorPosition(G_sbyteXUser + G_byteX - 2, G_sbyteYUser + G_byteY - 2);
 
                             // ecrit le carctère du tableau du joueur + gbyteY - 2 car on est dans une zone autour du pion
-                            Console.Write(G_Tab_charCavalier[G_sbyteYUser + byteY - 2, G_sbyteXUser + byteX - 2]);
+                            Console.Write(G_Tab_charCavalier[G_sbyteYUser + G_byteY - 2, G_sbyteXUser + G_byteX - 2]);
                         }
                     }
                     catch (ArgumentOutOfRangeException)
@@ -473,7 +528,7 @@ namespace ProjetCavalierFinal
                     catch (IndexOutOfRangeException)
                     {
 
-                    }
+                    }                   
                 } // fin boucle for X
             } // fin boucle for Y
         } // fin void static DecoPion
@@ -484,7 +539,7 @@ namespace ProjetCavalierFinal
         /// Optimisation : ok
         /// </summary>
 
-        private static void CavalierClean(byte byteUser)
+        private static void CavalierClean()
         {
             // regarde si la position actuelle du joueur est un endroit ou il est déjà passé ou pas
             if (G_Tab_charCavalier[G_sbyteYUser, G_sbyteXUser] == 'x')
@@ -498,11 +553,11 @@ namespace ProjetCavalierFinal
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
             // déplace le curseur sur le tableau clean
-            Console.SetCursorPosition(G_sbyteXUser + byteUser + 1, G_sbyteYUser);
+            Console.SetCursorPosition(G_sbyteXUser + G_sbyteUser + 1, G_sbyteYUser);
 
             // ecrit ce que il y a dans le tableau clean depuis le tableau joueur
             Console.Write(G_Tab_charCavalier[G_sbyteYUser, G_sbyteXUser]);
-            
+
         } // fin static void CavalierClean
 
         /// <summary>
@@ -511,18 +566,17 @@ namespace ProjetCavalierFinal
         /// Optimisation : ok
         /// </summary>
 
-        private static sbyte checkTbl(sbyte sbytePlusMoin, byte byteUser)
+        private static sbyte checkTbl(sbyte sbytePlusMoin)
         {
             // regarde si il se trouve sur les bordures du cavalier
-            if (G_sbyteXUser == 0 || G_sbyteXUser == byteUser - 1 || G_sbyteYUser == 0 || G_sbyteYUser == byteUser - 1)
+            if (G_sbyteXUser == 0 || G_sbyteXUser == G_sbyteUser - 1 || G_sbyteYUser == 0 || G_sbyteYUser == G_sbyteUser - 1)
             {
                 // ecriture que il doit rester dans le tableau
-                ErreurTbl(byteUser);
+                ErreurTbl();
 
                 // return la valeur entrée a additionner pour que le pion revienne dans la position d'avant
                 return sbytePlusMoin;
-            }
-            // si non, ecrit dans le tableau ou est le pion
+            }// si non, ecrit dans le tableau ou est le pion
             else if (G_Tab_charCavalier[G_sbyteYUser, G_sbyteXUser] == 'x')
             {
                 // ecrit O dans le tableau user
@@ -549,18 +603,13 @@ namespace ProjetCavalierFinal
         /// Optimisation : je pense c'est pas mal
         /// </summary>
 
-        private static void Cavalier(byte byteUser)
+        private static bool Cavalier()
         {
-            // variables locales
-            bool boolDefVar = true;
-            if (boolDefVar)
-            {
-                byte[] byteXYUser = { 1, 1 };
-                boolDefVar = false;
-            }
+            // reset du bool a chaque fois vu que l'user peut recommencer autent de fois que il veut
+            bool boolReset = false;
 
             // regarde si le pion se trouve vers une bordure
-            CheckChar(byteUser);
+            CheckChar();
 
             // change l'ecriture des craratères en vert
             Console.ForegroundColor = ConsoleColor.Green;
@@ -583,7 +632,7 @@ namespace ProjetCavalierFinal
                     --G_sbyteXUser;
 
                     // remet le pion ou il était avant et ecrit un message d'erreur
-                    G_sbyteXUser += checkTbl(1, byteUser);
+                    G_sbyteXUser += checkTbl(1);
 
                     // sort du switch
                     break;
@@ -594,7 +643,7 @@ namespace ProjetCavalierFinal
                     ++G_sbyteXUser;
 
                     // remet le pion ou il était avant et ecrit un message d'erreur
-                    G_sbyteXUser += checkTbl(-1, byteUser);
+                    G_sbyteXUser += checkTbl(-1);
 
                     // sort du switch
                     break;
@@ -605,7 +654,7 @@ namespace ProjetCavalierFinal
                     --G_sbyteYUser;
 
                     // remet le pion ou il était avant et ecrit un message d'erreur
-                    G_sbyteYUser += checkTbl(1, byteUser);
+                    G_sbyteYUser += checkTbl(1);
 
                     // sort du switch
                     break;
@@ -616,7 +665,7 @@ namespace ProjetCavalierFinal
                     ++G_sbyteYUser;
 
                     // remet le pion ou il était avant et ecrit un message d'erreur
-                    G_sbyteYUser += checkTbl(-1, byteUser);
+                    G_sbyteYUser += checkTbl(-1);
 
                     // sort du switch
                     break;
@@ -632,16 +681,19 @@ namespace ProjetCavalierFinal
                 case ConsoleKey.R:
 
                     // reset le cavalier, se réferer au static void Reset() pour le code
-                    Reset(byteUser);
+                    Reset();
+
+                    // affirme que le cavalier a été reset, pour reset le tableau flatten du nouveau answer cavalier
+                    boolReset = true;
 
                     // sort du switch
                     break;
-                
+
                 // si aucune de ces actions on été effectuées, alors sa veut dire que l'user a appuuyé sur une touche autre du clavier
                 default:
 
                     // met le curseur en dehor du cavalier
-                    Console.SetCursorPosition(byteUser - 2, byteUser + 4);
+                    Console.SetCursorPosition(G_sbyteUser - 2, G_sbyteUser + 4);
 
                     // set la console en rouge
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -654,8 +706,10 @@ namespace ProjetCavalierFinal
             } // fin du switch
 
             // permet de décorer le pion
-            DecoPion(byteUser);
+            DecoPion();
 
+            // retunr le bool // si vrai alors tableau flatten reset en nouveau tbl answer
+            return boolReset;
         } // fin static bool cavalier
 
         /// <summary>
@@ -666,35 +720,39 @@ namespace ProjetCavalierFinal
 
         private static void Main(string[] agrs)
         {
-            // variables
-            byte byteUser = 0;
-
             // enlève la visibilité du curseur
             Console.CursorVisible = false;
 
             // call le programm InputUser, se réferer au static void InputUser() pour le code
-            byteUser = InputUser();
+            InputUser();
 
             // call le programm tableau, se réferer au static void Tableau() pour le code
-            Tableau(byteUser);
+            Tableau();
 
             // permet de décorer le pion
-            DecoPion(byteUser);
+            DecoPion();
 
             // call le programm cavalier, se réferer au static void CavalierClean() pour le code
-            CavalierClean(byteUser);
+            CavalierClean();
+
+            // flatten le tableau qui permet de comparer si le joueur l'a rempli de 'O'
+            // bug, n'arrive pas a reset le tableau flattent
+            char[] tab_FlattenTblAnswer = G_Tab_charCavalierAnswer.Cast<char>().ToArray();
 
             // crée une première version du tableau ou le pion se trouve
             char[] tab_FlattenPion = G_Tab_charCavalier.Cast<char>().ToArray();
 
             // cavalier, recommence tant que le chat restart = o
-            for (; !tab_FlattenPion.SequenceEqual(G_Tab_charCavalierAnswer) ;)
+            for (; !tab_FlattenPion.SequenceEqual(tab_FlattenTblAnswer) ;)
             {
                 // call le programm cavalier, se réferer au static void CavalierClean() pour le code
-                CavalierClean(byteUser);
+                CavalierClean();
 
                 // call le programm cavalier, se réferer au static void Cavalier() pour le code
-                Cavalier(byteUser);
+                if (Cavalier())
+                {
+                    tab_FlattenTblAnswer = G_Tab_charCavalierAnswer.Cast<char>().ToArray();
+                }
 
                 // reflaten le tableau a chaque fois vu que on se déplace
                 tab_FlattenPion = G_Tab_charCavalier.Cast<char>().ToArray();
@@ -719,4 +777,4 @@ namespace ProjetCavalierFinal
 
 
 // fin optimisation et commentaire du projet le 15.03.2020
-// j'ai optimisé les parties du code que je trouvais nul et mis des commentaires partout ( litéralement )
+// j'ai optimisé les parties du code que je trouvais nul et mis des commentaires partout ( litéralement ) 
