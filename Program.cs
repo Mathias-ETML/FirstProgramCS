@@ -246,8 +246,6 @@ namespace ProjetCavalierFinal
             // sleep de 1000 sec
             Thread.Sleep(1000);
 
-            Console.ReadKey();
-
         } // fin void static ErreurTbl()
 
         /// <summary>
@@ -551,14 +549,6 @@ namespace ProjetCavalierFinal
 
         private static void Cavalier(byte byteUser)
         {
-            // variables locales
-            bool boolDefVar = true;
-            if (boolDefVar)
-            {
-                byte[] byteXYUser = { 1, 1 };
-                boolDefVar = false;
-            }
-
             // regarde si le pion se trouve vers une bordure
             CheckChar(byteUser);
 
